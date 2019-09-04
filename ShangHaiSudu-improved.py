@@ -1,21 +1,3 @@
-'''
-def params(para):
-    if para=='all_wheels_on_track':
-        return True
-    elif para=='track_width':
-        return 3
-    elif para=='distance_from_center':
-        return 1.5
-    elif para=='is_left_of_center':
-        return True
-    elif para=='heading':
-        return 0
-    elif para=='progress':
-        return 10
-    elif para=='steering_angle':
-        return 0
-'''
-
 def reward_function(params):
     '''
     Example of rewarding the agent to follow center line
@@ -23,43 +5,44 @@ def reward_function(params):
     
     # Read input parameters
     
-    # x
     # float
     # Location in meters of the vehicle center along the x axis of the simulated 
     # environment containing the track. The origin is at the lower-left corner of 
     # the simulated environment.
+    x = params['x']    
     
-    # y
     # float
     # Location in meters of the vehicle center along the y axis of the simulated 
     # environment containing the track. The origin is at the lower-left corner of 
     # the simulated environment.    
+    y = params['y']    
     
     # heading
     # float (-180, 180]
     # Heading direction in degrees of the vehicle with respect to the x-axis 
     # of the coordinate system.
-    #heading = params['heading']    
+    heading = params['heading']    
     
-    # progress
     # float [0, 100]
     # Percentage of the track complete.
-    # progress = params['progress']
+    progress = params['progress']
     
-    # steps
     # integer
     # Number of steps completed. One step is one (state, action, next state, reward tuple).
+    steps = params['steps']
     
     # waypoints
     # List of (float, float)
     # An ordered list of milestones along the track center. Each milestone is 
     # described by a coordinate of (x, y). 
+    waypoints = params['waypoints']    
     
     # closest_waypoints
     # (integer, integer)
     # The zero-based indices of the two neighboring waypoints closest to the 
     # vehicle's current position of (x, y). The distance is measured by the 
     # Euclidean distance from the center of the vehicle.
+    closest_waypoints = params['closest_waypoints']    
     
     # A boolean flag to indicate if the vehicle is on-track or off-track. 
     # The vehicle is off-track (False) if all of its wheels are outside of the 
@@ -93,22 +76,29 @@ def reward_function(params):
     # smaller or larger than half of track_width.
     distance_from_center = params['distance_from_center']
 
-    myMarker = []
-    myN = 20
-    for i in range (myN):
-        myMarker.append(round(0.05*i,2))
-
-    myReward = []
-    for i in range (int(myN/2)):
-        myReward.append(0.05*(myN-i))
+    reward = 1e-3
     
-    for i in range (int(myN/2)):
-        myReward.append(-0.1*(i))    
+    # As distance from center often stay around 0.5 of track_width.
+    # Any normDistance > 0.5 would indicate it is almost offtrack
+    normDistance = distance_from_center/track_width
     
-    # Give higher reward if the car is closer to center line and vice versa
-    closestValue = min(myMarker, key=lambda x:abs(x-distance_from_center/track_width))
-    myMarkerIndex = [i for i,x in enumerate(myMarker) if x == closestValue][0]
-    reward = myReward[myMarkerIndex]
+    # this should give car full reward, the distance should be large enough
+    # Sometime car need to go out of the middle (sharp turn), and it's ok, we should not
+    # punish it
+    OK_DISTANCE = 0.2 
+    AVG_DISTANCE = 0.45
+    BAD_DISTANCE = 1 # The rest
+    if (normDistance<=OK_DISTANCE):
+        reward = 1
+    
+    # TODO: CHECK IF WE REALLY NEED TO PUNISH CAR TO GO NEAR OUTSIDE?
+    elif (normDistance<=AVG_DISTANCE):
+        reward = 1
+    else:
+        # If car is on the left side and try to turn left --> should be no
+        if(is_left_of_center and (steering_angle <= -25)):
+            reward = 1e-3 
+        #else:
        
     return float(reward)
 
@@ -121,7 +111,12 @@ params1 = {'all_wheels_on_track': True,
           'heading': 0,
           'progress': 10,
           'steering_angle': 0,
-          'speed': 5.33
+          'speed': 5.33,
+          'x': 3.12,
+          'y': 1.15,
+          'steps': 12,
+          'waypoints': [1.21, 0.26],
+          'closest_waypoints': 2
         }       
 
 params2 = {'all_wheels_on_track': True,
@@ -131,7 +126,12 @@ params2 = {'all_wheels_on_track': True,
           'heading': 0,
           'progress': 10,
           'steering_angle': 0,
-          'speed': 2.67
+          'speed': 2.67,
+          'x': 3.12,
+          'y': 1.15,
+          'steps': 12,
+          'waypoints': [1.21, 0.26],
+          'closest_waypoints': 2
         }  
 
 params3 = {'all_wheels_on_track': True,
@@ -141,7 +141,12 @@ params3 = {'all_wheels_on_track': True,
           'heading': 0,
           'progress': 10,
           'steering_angle': 0,
-          'speed': 8
+          'speed': 8,
+          'x': 3.12,
+          'y': 1.15,
+          'steps': 12,
+          'waypoints': [1.21, 0.26],
+          'closest_waypoints': 2
         }  
 
 params4 = {'all_wheels_on_track': True,
@@ -151,7 +156,27 @@ params4 = {'all_wheels_on_track': True,
           'heading': 0,
           'progress': 10,
           'steering_angle': 0,
-          'speed': 5.33
+          'speed': 5.33,
+          'x': 3.12,
+          'y': 1.15,
+          'steps': 12,
+          'waypoints': [1.21, 0.26],
+          'closest_waypoints': 2
+        }   
+
+params5 = {'all_wheels_on_track': True,
+          'track_width': 3,
+          'distance_from_center': 1.4,
+          'is_left_of_center': True,
+          'heading': 0,
+          'progress': 10,
+          'steering_angle': -30,
+          'speed': 5.33,
+          'x': 3.12,
+          'y': 1.15,
+          'steps': 12,
+          'waypoints': [1.21, 0.26],
+          'closest_waypoints': 2
         }   
 
 
@@ -161,5 +186,6 @@ print ('OFF Track: {}'.format(reward_function(params1)))
 print ('near middle Track: {}'.format(reward_function(params2)))
 print ('nearer middle Track: {}'.format(reward_function(params3)))
 print ('Middle Track: {}'.format(reward_function(params4)))
+print ('Turn sharp left when near left offtrack: {}'.format(reward_function(params5)))
 
 
