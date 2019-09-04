@@ -91,33 +91,34 @@ def reward_function(params):
     
     
     strPos = "UNK"
-    strTurn = "UNK"
+    
+    reward = progress/steps + speed/10 
+    
     if (normDistance<=OK_DISTANCE):
-        reward = 1
+        reward += 1
         strPos = "GOD"        
     
     # TODO: CHECK IF WE REALLY NEED TO PUNISH CAR TO GO NEAR OUTSIDE?
     elif (normDistance<=AVG_DISTANCE):
-        reward = 1
+        reward += 0.9
         strPos = "AVG"
         
         # If car is on the left side and try to turn left --> should be no
-        if((is_left_of_center and (steering_angle <= -25)) or 
-           (not is_left_of_center and (steering_angle >= 25))):
-            carString="POS: AVG, TURN: VBA, SPE {:.2f}".format(speed)
-            strTurn = "VBA"
-            reward = 0.2
+        if((is_left_of_center and (steering_angle <= -15)) or 
+           (not is_left_of_center and (steering_angle >= 15))):            
+            reward = 1e-3
     else:
         carString="POS: AVG, TURN: UNK, SPE: {:.2f}".format(speed)
         # If car is on the left side and try to turn left --> should be no
-        if((is_left_of_center and (steering_angle <= 0)) or 
-           (not is_left_of_center and (steering_angle >= 0))):            
+        if((is_left_of_center and (steering_angle <= -1)) or 
+           (not is_left_of_center and (steering_angle >= 1))):            
             strPos = "BAD"
-            strTurn = "BAD"
-            reward = 1e-4 
-        #else:
+            reward = 1e-3
         
-    carString="REW: {:7.4f}, POS: {}, TURN: {}, SPE: {:.2f}".format(reward, strPos, strTurn, speed)    
+        
+    carString=('REW: {:7.4f}, POS: {}, TURN: {:3.0f}, SPE: {:.2f}, DISTANCE: {}'
+               ', TRACK_WIDTH: {}'.format(reward, strPos, 
+                steering_angle, speed, distance_from_center, track_width))
 
     print(carString)    
     
@@ -131,7 +132,7 @@ offtrack = {'all_wheels_on_track': True,
           'is_left_of_center': True,
           'heading': 0,
           'progress': 10,
-          'steering_angle': 0,
+          'steering_angle': -20,
           'speed': 5.33,
           'x': 3.12,
           'y': 1.15,
