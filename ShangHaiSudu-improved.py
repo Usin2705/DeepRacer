@@ -85,43 +85,50 @@ def reward_function(params):
     # this should give car full reward, the distance should be large enough
     # Sometime car need to go out of the middle (sharp turn), and it's ok, we should not
     # punish it
+    BEST_DISTANCE = 0.1
     OK_DISTANCE = 0.2 
-    AVG_DISTANCE = 0.4
-    BAD_DISTANCE = 1 # The rest
+    AVG_DISTANCE = 0.35	
+    BAD_DISTANCE = 1 
+			# The rest
     
     
     strPos = "UNK"
     
-    reward = progress/steps + speed/10 
+    if (steps!=0):
+        reward = progress/steps + speed/20 
     
-    if (normDistance<=OK_DISTANCE):
+    if (normDistance<=BEST_DISTANCE):
         reward += 1
-        strPos = "GOD"        
+        strPos = "BST"
+        
+    elif(normDistance<=OK_DISTANCE):
+        reward +=0.8
+        strPos = "OKE"
     
     # TODO: CHECK IF WE REALLY NEED TO PUNISH CAR TO GO NEAR OUTSIDE?
+    # WE NEED TO PUNISH THEM HEAVILY, OTHERWISE THEY WILL GO OUTSIDE AS IT STILL INCREASE REWARD
     elif (normDistance<=AVG_DISTANCE):
-        reward += 0.9
+        reward += 0.6
         strPos = "AVG"
         
         # If car is on the left side and try to turn left --> should be no
         if((is_left_of_center and (steering_angle <= -15)) or 
            (not is_left_of_center and (steering_angle >= 15))):            
             reward = 1e-3
-    else:
-        carString="POS: AVG, TURN: UNK, SPE: {:.2f}".format(speed)
-        # If car is on the left side and try to turn left --> should be no
-        if((is_left_of_center and (steering_angle <= -1)) or 
-           (not is_left_of_center and (steering_angle >= 1))):            
-            strPos = "BAD"
+    else:        
+        strPos = "BAD"        
+        # If car is on the left side and try to turn sharp RIGHT --> should be yes
+        if((is_left_of_center and (steering_angle >= 25)) or 
+           (not is_left_of_center and (steering_angle <= -25))):            
+            reward += 0.5
+        else:
             reward = 1e-3
         
-        
-    carString=('REW: {:7.4f}, POS: {}, TURN: {:3.0f}, SPE: {:.2f}, DISTANCE: {}'
-               ', TRACK_WIDTH: {}'.format(reward, strPos, 
-                steering_angle, speed, distance_from_center, track_width))
+    carString=('REW: {:7.4f}, POS: {}, TURN: {:3.0f}, SPE: {:.2f}, NORMDIST: {:.2f}, DISTANCE: {:.2f}'
+               ', TRACK_WIDTH: {:.2f}'.format(reward, strPos, 
+                steering_angle, speed, normDistance, distance_from_center, track_width))
 
-    print(carString)    
-    
+    print(carString)        
     return float(reward)
 
 
