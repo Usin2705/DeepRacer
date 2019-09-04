@@ -1,3 +1,4 @@
+import math
 '''
 def params(para):
     if para=='all_wheels_on_track':
@@ -23,23 +24,23 @@ def reward_function(params):
     
     # Read input parameters
     
-    # x
     # float
     # Location in meters of the vehicle center along the x axis of the simulated 
     # environment containing the track. The origin is at the lower-left corner of 
     # the simulated environment.
+    x = params['x']    
     
-    # y
     # float
     # Location in meters of the vehicle center along the y axis of the simulated 
     # environment containing the track. The origin is at the lower-left corner of 
     # the simulated environment.    
+    y = params['y']    
     
     # heading
     # float (-180, 180]
     # Heading direction in degrees of the vehicle with respect to the x-axis 
     # of the coordinate system.
-    #heading = params['heading']    
+    heading = params['heading']    
     
     # progress
     # float [0, 100]
@@ -54,12 +55,14 @@ def reward_function(params):
     # List of (float, float)
     # An ordered list of milestones along the track center. Each milestone is 
     # described by a coordinate of (x, y). 
+    waypoints = params['waypoints']    
     
     # closest_waypoints
     # (integer, integer)
     # The zero-based indices of the two neighboring waypoints closest to the 
     # vehicle's current position of (x, y). The distance is measured by the 
     # Euclidean distance from the center of the vehicle.
+    closest_waypoints = params['closest_waypoints']    
     
     # A boolean flag to indicate if the vehicle is on-track or off-track. 
     # The vehicle is off-track (False) if all of its wheels are outside of the 
@@ -93,69 +96,63 @@ def reward_function(params):
     # smaller or larger than half of track_width.
     distance_from_center = params['distance_from_center']
 
-    myMarker = []
-    myN = 20
-    for i in range (myN):
-        myMarker.append(round(0.05*i,2))
+    reward = 1e-3
+    
+    rabbit = [0,0]
+    pointing = [0,0]
+        
+    # Reward when yaw (car_orientation) is pointed to the next waypoint IN FRONT.
+    
+    # Find nearest waypoint coordinates
+    
+    rabbit = [waypoints[closest_waypoints[1]][0],waypoints[closest_waypoints[1]][1]]
+    
+    radius = math.hypot(x - rabbit[0], y - rabbit[1])
+    
+    pointing[0] = x + (radius * math.cos(heading))
+    pointing[1] = y + (radius * math.sin(heading))
+    
+    vector_delta = math.hypot(pointing[0] - rabbit[0], pointing[1] - rabbit[1])
+    
+    # Max distance for pointing away will be the radius * 2
+    # Min distance means we are pointing directly at the next waypoint
+    # We can setup a reward that is a ratio to this max.
+    
+    if vector_delta == 0:
+        reward += 1
+    else:
+        reward += ( 1 - ( vector_delta / (radius * 2)))
+        
+    if speed >= 6:
+        reward +=0.3
+    if speed >= 4:
+        reward +=0.1
+    if speed >= 2:
+        reward +=0.01
 
-    myReward = []
-    for i in range (int(myN/2)):
-        myReward.append(0.05*(myN-i))
+    print('Reward {:.2f}, x: {:.2f}, y: {:.2f}, vector_delta: {:.2f}, rabbit: {}, radius: {:.2f}, pointing: {}, Params: {}'.format(reward, x, y, vector_delta, rabbit, radius, pointing, params))
     
-    for i in range (int(myN/2)):
-        myReward.append(-0.1*(i))    
-    
-    # Give higher reward if the car is closer to center line and vice versa
-    closestValue = min(myMarker, key=lambda x:abs(x-distance_from_center/track_width))
-    myMarkerIndex = [i for i,x in enumerate(myMarker) if x == closestValue][0]
-    reward = myReward[myMarkerIndex]
-       
     return float(reward)
 
 
  
 params1 = {'all_wheels_on_track': True,
           'track_width': 3,
-          'distance_from_center': 2.8,
-          'is_left_of_center': True,
-          'heading': 0,
-          'progress': 10,
-          'steering_angle': 0
-        }       
-
-params2 = {'all_wheels_on_track': True,
-          'track_width': 3,
-          'distance_from_center': 2,
-          'is_left_of_center': True,
-          'heading': 0,
-          'progress': 10,
-          'steering_angle': 0
-        }  
-
-params3 = {'all_wheels_on_track': True,
-          'track_width': 3,
-          'distance_from_center': 0.5,
-          'is_left_of_center': True,
-          'heading': 0,
-          'progress': 10,
-          'steering_angle': 0
-        }  
-
-params4 = {'all_wheels_on_track': True,
-          'track_width': 3,
           'distance_from_center': 0.1,
           'is_left_of_center': True,
           'heading': 0,
           'progress': 10,
-          'steering_angle': 0
+          'steering_angle': 0,          
+          'x': 0.1,
+          'y': 0.4,
+          'headings': 0.14,
+          'waypoints': [[0.1,0.02], [0.2,0.04]],
+          'closest_waypoints': (1, 1),
+          'speed': 5.67
         }   
 
 
 
-
-print ('OFF Track: {}'.format(reward_function(params1)))
-print ('near middle Track: {}'.format(reward_function(params2)))
-print ('nearer middle Track: {}'.format(reward_function(params3)))
-print ('Middle Track: {}'.format(reward_function(params4)))
+print ('Middle Track: {}'.format(reward_function(params1)))
 
 
