@@ -76,7 +76,7 @@ def reward_function(params):
     # smaller or larger than half of track_width.
     distance_from_center = params['distance_from_center']
 
-    reward = 1e-3
+    reward = 1e-4
     
     # As distance from center often stay around 0.5 of track_width.
     # Any normDistance > 0.5 would indicate it is almost offtrack
@@ -86,27 +86,48 @@ def reward_function(params):
     # Sometime car need to go out of the middle (sharp turn), and it's ok, we should not
     # punish it
     OK_DISTANCE = 0.2 
-    AVG_DISTANCE = 0.45
+    AVG_DISTANCE = 0.4
     BAD_DISTANCE = 1 # The rest
+    
+    
+    strPos = "UNK"
+    strTurn = "UNK"
     if (normDistance<=OK_DISTANCE):
         reward = 1
+        strPos = "GOD"        
     
     # TODO: CHECK IF WE REALLY NEED TO PUNISH CAR TO GO NEAR OUTSIDE?
     elif (normDistance<=AVG_DISTANCE):
         reward = 1
-    else:
+        strPos = "AVG"
+        
         # If car is on the left side and try to turn left --> should be no
-        if(is_left_of_center and (steering_angle <= -25)):
-            reward = 1e-3 
+        if((is_left_of_center and (steering_angle <= -25)) or 
+           (not is_left_of_center and (steering_angle >= 25))):
+            carString="POS: AVG, TURN: VBA, SPE {:.2f}".format(speed)
+            strTurn = "VBA"
+            reward = 0.2
+    else:
+        carString="POS: AVG, TURN: UNK, SPE: {:.2f}".format(speed)
+        # If car is on the left side and try to turn left --> should be no
+        if((is_left_of_center and (steering_angle <= 0)) or 
+           (not is_left_of_center and (steering_angle >= 0))):            
+            strPos = "BAD"
+            strTurn = "BAD"
+            reward = 1e-4 
         #else:
-       
+        
+    carString="REW: {:7.4f}, POS: {}, TURN: {}, SPE: {:.2f}".format(reward, strPos, strTurn, speed)    
+
+    print(carString)    
+    
     return float(reward)
 
 
  
-params1 = {'all_wheels_on_track': True,
+offtrack = {'all_wheels_on_track': True,
           'track_width': 3,
-          'distance_from_center': 2.8,
+          'distance_from_center': 1.6,
           'is_left_of_center': True,
           'heading': 0,
           'progress': 10,
@@ -121,11 +142,11 @@ params1 = {'all_wheels_on_track': True,
 
 params2 = {'all_wheels_on_track': True,
           'track_width': 3,
-          'distance_from_center': 2,
-          'is_left_of_center': True,
+          'distance_from_center': 0.5,
+          'is_left_of_center': False,
           'heading': 0,
           'progress': 10,
-          'steering_angle': 0,
+          'steering_angle': 10,
           'speed': 2.67,
           'x': 3.12,
           'y': 1.15,
@@ -136,11 +157,11 @@ params2 = {'all_wheels_on_track': True,
 
 params3 = {'all_wheels_on_track': True,
           'track_width': 3,
-          'distance_from_center': 0.5,
+          'distance_from_center': 0.3,
           'is_left_of_center': True,
           'heading': 0,
           'progress': 10,
-          'steering_angle': 0,
+          'steering_angle': -10,
           'speed': 8,
           'x': 3.12,
           'y': 1.15,
@@ -166,6 +187,37 @@ params4 = {'all_wheels_on_track': True,
 
 params5 = {'all_wheels_on_track': True,
           'track_width': 3,
+          'distance_from_center': 1.2,
+          'is_left_of_center': True,
+          'heading': 0,
+          'progress': 10,
+          'steering_angle': -30,
+          'speed': 5.33,
+          'x': 3.12,
+          'y': 1.15,
+          'steps': 12,
+          'waypoints': [1.21, 0.26],
+          'closest_waypoints': 2
+        }   
+
+params6 = {'all_wheels_on_track': True,
+          'track_width': 3,
+          'distance_from_center': 1.2,
+          'is_left_of_center': False,
+          'heading': 0,
+          'progress': 10,
+          'steering_angle': 30,
+          'speed': 5.33,
+          'x': 3.12,
+          'y': 1.15,
+          'steps': 12,
+          'waypoints': [1.21, 0.26],
+          'closest_waypoints': 2
+        }   
+
+
+params7 = {'all_wheels_on_track': True,
+          'track_width': 3,
           'distance_from_center': 1.4,
           'is_left_of_center': True,
           'heading': 0,
@@ -179,13 +231,30 @@ params5 = {'all_wheels_on_track': True,
           'closest_waypoints': 2
         }   
 
+params8 = {'all_wheels_on_track': True,
+          'track_width': 3,
+          'distance_from_center': 1.4,
+          'is_left_of_center': False,
+          'heading': 0,
+          'progress': 10,
+          'steering_angle': 30,
+          'speed': 5.33,
+          'x': 3.12,
+          'y': 1.15,
+          'steps': 12,
+          'waypoints': [1.21, 0.26],
+          'closest_waypoints': 2
+        }   
 
 
 
-print ('OFF Track: {}'.format(reward_function(params1)))
-print ('near middle Track: {}'.format(reward_function(params2)))
-print ('nearer middle Track: {}'.format(reward_function(params3)))
+
+print ('Off Track, left, 0 steering: {}'.format(reward_function(offtrack)))
+print ('near middle Track, right, 10 steering: {}'.format(reward_function(params2)))
+print ('nearer middle Track, left, -10 steering: {}'.format(reward_function(params3)))
 print ('Middle Track: {}'.format(reward_function(params4)))
 print ('Turn sharp left when near left offtrack: {}'.format(reward_function(params5)))
-
+print ('Turn sharp right when near right offtrack: {}'.format(reward_function(params6)))
+print ('Turn sharp left when almost left offtrack: {}'.format(reward_function(params7)))
+print ('Turn sharp right when almost right offtrack: {}'.format(reward_function(params8)))
 
