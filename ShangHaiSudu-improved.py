@@ -49,10 +49,10 @@ def reward_function(params):
     # track borders. It's on-track (True) if any of the wheels is inside the two track borders.
     all_wheels_on_track = params['all_wheels_on_track']    
         
-     # float [-30, 30]
-     # Steering angle, in degrees, of the front wheels from the center line of 
-     # the vehicle. The negative sign (-) means steering to the right and the positive 
-     # (+) sign means steering to the left.     
+    # float [-30, 30]
+    # Steering angle, in degrees, of the front wheels from the center line of 
+    # the vehicle. The negative sign (-) means steering to the right and the positive 
+    # (+) sign means steering to the left.     
     steering_angle = params['steering_angle']
     
     # boolean
@@ -88,14 +88,13 @@ def reward_function(params):
     BEST_DISTANCE = 0.1
     OK_DISTANCE = 0.2 
     AVG_DISTANCE = 0.35	
-    BAD_DISTANCE = 1 
-			# The rest
+    BAD_DISTANCE = 0.5  # The rest is impossible to save
     
     
     strPos = "UNK"
     
     if (steps!=0):
-        reward = progress/steps + speed/20 
+        reward = progress*2/steps + speed/15 
     
     if (normDistance<=BEST_DISTANCE):
         reward += 1
@@ -108,25 +107,30 @@ def reward_function(params):
     # TODO: CHECK IF WE REALLY NEED TO PUNISH CAR TO GO NEAR OUTSIDE?
     # WE NEED TO PUNISH THEM HEAVILY, OTHERWISE THEY WILL GO OUTSIDE AS IT STILL INCREASE REWARD
     elif (normDistance<=AVG_DISTANCE):
-        reward += 0.6
         strPos = "AVG"
         
         # If car is on the left side and try to turn left --> should be no
         if((is_left_of_center and (steering_angle <= -15)) or 
            (not is_left_of_center and (steering_angle >= 15))):            
-            reward = 1e-3
-    else:        
-        strPos = "BAD"        
-        # If car is on the left side and try to turn sharp RIGHT --> should be yes
-        if((is_left_of_center and (steering_angle >= 25)) or 
-           (not is_left_of_center and (steering_angle <= -25))):            
-            reward += 0.5
+            reward += 1e-4
         else:
-            reward = 1e-3
+            reward += 0.4
+    elif (normDistance<=BAD_DISTANCE):
+        strPos = "BAD"
         
-    carString=('REW: {:7.4f}, POS: {}, TURN: {:3.0f}, SPE: {:.2f}, NORMDIST: {:.2f}, DISTANCE: {:.2f}'
+        # If car is on the left side and try to turn sharp left --> should be no
+        if((is_left_of_center and (steering_angle <= -15)) or 
+           (not is_left_of_center and (steering_angle >= 15))):            
+            reward += 1e-4
+        else:
+            reward += 0.2
+    else:
+        strPos = "IMM"
+        reward = 1e-4
+        
+    carString=('REW: {:7.4f}, POS: {}, TURN: {:3.0f}, SPE: {:.2f}, IS_LEFT {}, NORMDIST: {:.2f}, DISTANCE: {:.2f}'
                ', TRACK_WIDTH: {:.2f}'.format(reward, strPos, 
-                steering_angle, speed, normDistance, distance_from_center, track_width))
+                steering_angle, speed, is_left_of_center, normDistance, distance_from_center, track_width))
 
     print(carString)        
     return float(reward)
