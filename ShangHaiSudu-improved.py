@@ -97,36 +97,26 @@ def reward_function(params):
         reward = progress*2/steps + speed/15 
     
     if (normDistance<=BEST_DISTANCE):
-        reward += 1
         strPos = "BST"
+        reward += 1        
         
     elif(normDistance<=OK_DISTANCE):
-        reward +=0.8
         strPos = "OKE"
+        reward +=0.8        
     
     # TODO: CHECK IF WE REALLY NEED TO PUNISH CAR TO GO NEAR OUTSIDE?
     # WE NEED TO PUNISH THEM HEAVILY, OTHERWISE THEY WILL GO OUTSIDE AS IT STILL INCREASE REWARD
     elif (normDistance<=AVG_DISTANCE):
         strPos = "AVG"
-        
-        # If car is on the left side and try to turn left --> should be no
-        if((is_left_of_center and (steering_angle <= -15)) or 
-           (not is_left_of_center and (steering_angle >= 15))):            
-            reward += 1e-4
-        else:
-            reward += 0.4
+        reward += 0.4
+
     elif (normDistance<=BAD_DISTANCE):
         strPos = "BAD"
-        
-        # If car is on the left side and try to turn sharp left --> should be no
-        if((is_left_of_center and (steering_angle <= -15)) or 
-           (not is_left_of_center and (steering_angle >= 15))):            
-            reward += 1e-4
-        else:
-            reward += 0.2
+        reward += 0.2
+
     else:
         strPos = "IMM"
-        reward = 1e-4
+        reward += 1e-4
         
     carString=('REW: {:7.4f}, POS: {}, TURN: {:3.0f}, SPE: {:.2f}, IS_LEFT {}, NORMDIST: {:.2f}, DISTANCE: {:.2f}'
                ', TRACK_WIDTH: {:.2f}'.format(reward, strPos, 
