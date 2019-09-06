@@ -22,7 +22,10 @@ Now you know more about docker, use this quick and easy way (it's the same thing
 ```
 docker logs -f --tail 30 robomaker
 ```
-
+Solve "ResourceExhaustedError: OOM" problem (hei, if you're at this point at least it work heh):
+```
+docker exec -t $(docker ps | grep sagemaker | cut -d" " -f1) redis-cli config set client-output-buffer-limit "slave 836870912 836870912 0"
+```
 
 SIM_TRACE_LOG explain:
 
