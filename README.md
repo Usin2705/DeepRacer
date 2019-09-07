@@ -14,10 +14,19 @@ First, we need to find the id of container (find the ID of deepracer_robomaker:c
 docker ps
 ```
 
-show the log and auto update with last info:
+Secondly, show the log and auto update with last info:
 ```
-docker logs -f --tail 10 {ID}
+docker logs -f --tail 30 {ID}
 ```
+Now you know more about docker, use this quick and easy way (it's the same thing, just skip the ID and go straight to the name)
+```
+docker logs -f --tail 30 robomaker
+```
+Solve "ResourceExhaustedError: OOM" problem (hei, if you're at this point at least it work heh):
+```
+docker exec -t $(docker ps | grep sagemaker | cut -d" " -f1) redis-cli config set client-output-buffer-limit "slave 836870912 836870912 0"
+```
+
 SIM_TRACE_LOG explain:
 
 SIM_TRACE_LOG:EPISODE,STEP,X,Y,HEADING(RAD),STEERING(RAD),SPEED,ACTION_INDEX,REWARD,DONE(bool),IS_WHEEL_ON_TRACK(bool),PROGRESS,CLOSEST_WAYPOINTS,TRACK_LENGTH,TIME
