@@ -94,7 +94,7 @@ def reward_function(params):
     strPos = "UNK"
     
     if (steps!=0):
-        reward = progress*2/steps + speed/15 
+        reward = 0.5*(progress*2/steps) + speed/20
     
     if (normDistance<=BEST_DISTANCE):
         strPos = "BST"
