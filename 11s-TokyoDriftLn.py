@@ -103,19 +103,19 @@ def reward_function(params):
     
     if (normDistance<=BEST_DISTANCE):
         strPos = "BST"
-        reward += 0.8        
+        reward += 0.6        
         
     elif(normDistance<=OK_DISTANCE):
         strPos = "OKE"
-        reward +=0.64       
+        reward +=0.48       
     
     elif (normDistance<=AVG_DISTANCE):
         strPos = "AVG"
-        reward += 0.32
+        reward += 0.24
 
     elif (normDistance<=BAD_DISTANCE):
         strPos = "BAD"
-        reward += 0.16
+        reward += 0.12
 
     else:
         strPos = "IMM"
@@ -125,8 +125,8 @@ def reward_function(params):
         reward = 1e-4
         
     carString=('REW: {:7.4f}, RLN {:.2f} POS: {}, TURN: {:3.0f}, SPE: {:.2f}, IS_LEFT {}, NORMDIST: {:.2f}, DISTANCE: {:.2f}'
-               ', TRACK_WIDTH: {:.2f}'.format(reward, rewardLn, strPos, 
-                steering_angle, speed, is_left_of_center, normDistance, distance_from_center, track_width))
+               ', TRACK_WIDTH: {:.2f}, STEP: {}, PRO: {:2f}'.format(reward, rewardLn, strPos, 
+                steering_angle, speed, is_left_of_center, normDistance, distance_from_center, track_width, steps, progress))
 
     print(carString)        
     return float(reward)
