@@ -1,11 +1,20 @@
-import math
 def reward_function(params):
     '''
-    Example of rewarding the agent to follow center line
-    '''
+    Reward function for AWS deeprace
     
-    # Read input parameters
+    Parameters
+    ----------
+    params : py:class:`dict`
+        The dictionary contain all parameters for DeepRacer
+
+    Returns
+    -------
+    reward : py:class:`float`
+        The reward from DeepRacer's action, must be float otherwise AWS won't
+        accept it        
     
+    '''    
+
     # float
     # Location in meters of the vehicle center along the x axis of the simulated 
     # environment containing the track. The origin is at the lower-left corner of 
@@ -76,63 +85,14 @@ def reward_function(params):
     # track border and, depending on the width of the track border, can be slightly 
     # smaller or larger than half of track_width.
     distance_from_center = params['distance_from_center']
-
+    
     reward = 1e-4
-    rewardLn = 1e-4
     
-    # As distance from center often stay around 0.5 of track_width.
-    # Any normDistance > 0.5 would indicate it is almost offtrack
-    normDistance = distance_from_center/track_width
+    #Actual reward function go here
     
-    # this should give car full reward, the distance should be large enough
-    # Sometime car need to go out of the middle (sharp turn), and it's ok, we should not
-    # punish it
-    BEST_DISTANCE = 0.1
-    OK_DISTANCE = 0.2 
-    AVG_DISTANCE = 0.35	
-    BAD_DISTANCE = 0.5  # The rest is impossible to save
-    
-    
-    strPos = "UNK"
-    
-    
-
-    if (steps>=3):
-        reward = 5.2 + 4*math.log(progress/steps)
-        rewardLn = 5.2 + 4*math.log(progress/steps)
-    
-    if (normDistance<=BEST_DISTANCE):
-        strPos = "BST"
-        reward += 0.6        
-        
-    elif(normDistance<=OK_DISTANCE):
-        strPos = "OKE"
-        reward +=0.48       
-    
-    elif (normDistance<=AVG_DISTANCE):
-        strPos = "AVG"
-        reward += 0.24
-
-    elif (normDistance<=BAD_DISTANCE):
-        strPos = "BAD"
-        reward += 0.12
-
-    else:
-        strPos = "IMM"
-        reward += 1e-4
-        
-    if (reward <= 0):
-        reward = 1e-4
-        
-    carString=('REW: {:7.4f}, RLN {:.2f} POS: {}, TURN: {:3.0f}, SPE: {:.2f}, IS_LEFT {}, NORMDIST: {:.2f}, DISTANCE: {:.2f}'
-               ', TRACK_WIDTH: {:.2f}, STEP: {}, PRO: {:2f}'.format(reward, rewardLn, strPos, 
-                steering_angle, speed, is_left_of_center, normDistance, distance_from_center, track_width, steps, progress))
-
-    print(carString)        
     return float(reward)
 
-
- 
+# Sample params, not real, only for testing in python, do not copy to AWS
 offtrack = {'all_wheels_on_track': True,
           'track_width': 3,
           'distance_from_center': 1.6,
@@ -153,7 +113,7 @@ params2 = {'all_wheels_on_track': True,
           'distance_from_center': 0.5,
           'is_left_of_center': False,
           'heading': 0,
-          'progress': 1.2,
+          'progress': 8.2,
           'steering_angle': 10,
           'speed': 2.67,
           'x': 3.12,
@@ -183,7 +143,7 @@ params4 = {'all_wheels_on_track': True,
           'distance_from_center': 0.1,
           'is_left_of_center': True,
           'heading': 0,
-          'progress': 10,
+          'progress': 10.2,
           'steering_angle': 0,
           'speed': 5.33,
           'x': 3.12,
@@ -213,7 +173,7 @@ params6 = {'all_wheels_on_track': True,
           'distance_from_center': 1.2,
           'is_left_of_center': False,
           'heading': 0,
-          'progress': 10,
+          'progress': 10.9,
           'steering_angle': 30,
           'speed': 5.33,
           'x': 3.12,
@@ -229,7 +189,7 @@ params7 = {'all_wheels_on_track': True,
           'distance_from_center': 1.4,
           'is_left_of_center': True,
           'heading': 0,
-          'progress': 10,
+          'progress': 12.1,
           'steering_angle': -30,
           'speed': 5.33,
           'x': 3.12,
@@ -244,7 +204,7 @@ params8 = {'all_wheels_on_track': True,
           'distance_from_center': 1.4,
           'is_left_of_center': False,
           'heading': 0,
-          'progress': 10,
+          'progress': 12.1,
           'steering_angle': 30,
           'speed': 5.33,
           'x': 3.12,
@@ -253,8 +213,6 @@ params8 = {'all_wheels_on_track': True,
           'waypoints': [1.21, 0.26],
           'closest_waypoints': 2
         }   
-
-
 
 
 print ('Off Track, left, 0 steering: {}'.format(reward_function(offtrack)))
