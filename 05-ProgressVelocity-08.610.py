@@ -1,4 +1,10 @@
-from time import time
+# -*- coding: utf-8 -*-
+"""
+AWS DeepRacer reward function
+
+@author: Usin
+"""
+
 
 # https://github.com/breadcentric/aws-deepracer-workshops/blob/enhance-log-analysis/log-analysis/reward/reward_sample.py
 class MyCar:
@@ -57,9 +63,6 @@ class MyCar:
         if ((progress - self.pre_progress)>=5) or ((progress - self.pre_progress2)>=5):
             reward = 1e-4
             
-        if (reward <= 0):
-            reward = 1e-4        
-
         # Avoid negative reward
         if (reward <= 0):
             reward = 1e-4
