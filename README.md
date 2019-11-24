@@ -10,9 +10,9 @@ xx: ranking of model, the higher the better in actual AWS virtual race
 
 ModelName: The name of model
 
-yy.yyy: Actual shorted completed time in AWS virtual race sumission
+yy.yyy: Actual shortest completed time in AWS virtual race sumission
 
-Model_Action_Space: Some models come with their specific action space, as they require that action space to be able to has good performance
+Model_Action_Space: Some models come with their specific action space, as they require that action space to have good performance
 
 All model require variables from [InputParameter.py](https://github.com/Usin2705/DeepRacer/blob/master/InputParameter.py). That file contains all possible variable come from DeepRacer. You need to copied all necessary parameter from it to your reward function. InputParameter.py also contains faked params to test out the model and make sure it work.
 
@@ -31,6 +31,8 @@ Also at that moment I don't have enough time to set up a local training, and don
 From my understanding, in Reinforcement Learning, you don't need to come up with a sophisticated mathematic formula for your model. What you really need is a reward function, that properly align your target with the reward for each action, and make sure the machine interpret your target correctly (<b>important point</b>)
 
 You can read more about it [here](https://github.com/scottpletcher/deepracer/blob/master/iterations/v4-SelfMotivator.md) (this is from another DeepRacer)
+
+You can also try AWS [sample reward function](https://docs.aws.amazon.com/deepracer/latest/developerguide/deepracer-reward-function-input.html#reward-function-input-steps). I believe the idea here is quite the same. You need to twist it a little bit if you want to compete in top 50. For example, my top models alway finish the race with less than 160 steps, so using 300 steps in the example is just too much.
 
 So, since our ultimate target is reaching the finish line as soon as possible, the formular ```4*math.log(progress/steps)``` give higher reward point when progress increase faster than steps. The higher the progress vs 1 specific steps, the higher the reward we get. So if the car take 150 steps to finish the race, its total reward should be higher than the car that took 250 steps. I need to mutiply it by 4 to make the reward smaller (the ```4*math.log(progress/steps)``` return negative number) so the position reward (stay in center line) have significant important.
 
@@ -61,7 +63,7 @@ Now, the formular ```5.2 + 4*math.log(progress/steps)``` is not the best formula
 :-------------------------:|:-------------------------:
 ![](https://github.com/Usin2705/DeepRacer/blob/master/Improved-Ln-TokyoDrift-Canada-13-27s.png)  |  ![](https://github.com/Usin2705/DeepRacer/blob/master/Improved-Ln-TokyoDrift-Canada-12-00s.png)
 
-Notice that the the 12 second run on the right, the one that is better in our view, has lower reward than the 13.23 second. The machine see that wiggle the car around the road will bring better reward, and therefore the more we train our model, the more "wiggling" we'll get. The 12 second is still not the best run we can get, as I can see some corner that the car can cut throught (car don't need to always stay in the center line). The model has room for improvement, however if I train my model more, I'll get more wiggling instead of improvement.
+Notice the 12 second run on the right, the one that is better in our view, has lower reward than the 13.23 second. The machine see that wiggle the car around the road will add more reward, and total higher reward for the whole race, therefore the more we train our model, the more "wiggling" we'll get. The 12 second is still not the best run we can get, as I can see some corner that the car can cut throught (car don't need to always stay in the center line). The model has room for improvement, however if I train my model more, I'll get more wiggling instead of improvement.
 
 This is because our reward is not 100% aligned with our target, and therefore machine misinterpret it, leading to ineffective model. See the excel analysis from the training log, the reward here is only for ```5.2 + 4*math.log(progress/steps)```:
 <img src=https://github.com/Usin2705/DeepRacer/blob/master/Improved-Ln-TokyoDrift-Canada-Analysis-01.png>
@@ -96,6 +98,8 @@ Also, the reward function can be improve a little bit, that formula is not as go
 
 Action space is also something I should change. This model take a really long time to train so I only use small action space to save time. So the car was limited to a few actions that <b>I think</b> are the best, and that's not good. Car should be able to decide which actions is the best for this race, therefore I must give them much more options to choose.
 
+### After the November race, AWS increase the racing track width. Bigger width mean you can increase your speed more without the car go off track. So I'm trying to experiment with the new limit on car speed
+
 # Hyperparameters:
 
 I don't really know much about hyperparameters, so I can only talk about a few that I think I know:
@@ -118,7 +122,7 @@ If you want you can still use discount factor of 0.999, but from my experience (
 # AWS DeepRacer
 Thank Amazon for this wonderful experience. I learn a lot about AWS, Linux and Reinforcement Learning from the race, met wonderful people online, participating in a very challenging race until the end (that feeling when people start to kick you down out of the top 20, or every morning when you woke up, opened the console and saw another person reach 7.xxx second *O* )
 
-However, there's a few thing I believe should be improve here. Many people also say this as well. As DeepRacer accept even 1 successful run during 5 trials run in submission, even if you failed 4, as long as you were lucky with 1 run, you got better result than another person with 2 successful run but slower. As the result, to push for faster speed, people will tend to overfit their model, push the speed limit and gambling for 1 successful run in the submission. I did this as well. Therefore, people with more reliable model (and thus slower) are actually punished in the virtual race. Well, it's the same rule for everybody so I can't complain. I just think it would be interesting if AWS require minimum of 2 successful run/5 trials, as people will have to take care of the overfit problem, and the unreliable of their model.
+However, there's a few thing I believe should be improve here. Many people also say this as well. As DeepRacer accept even 1 successful run during 5 trials run in submission, even if you failed 4, as long as you were lucky with 1 run, you got better result than another person with 2 successful run but slower. As the result, to push for faster speed, people will tend to overfit their model, push the speed limit and gambling for 1 successful run in the submission. I did this as well. Therefore, people with more reliable model (and thus slower) are actually punished in the virtual race. Well, it's the same rule for everybody so I can't complain. I just think it would be interesting if AWS require minimum of 2 successful run/5 trials, as people will have to take care of the overfit problem, and the unreliable of their model. Actually, this is more critical in physical race, as you only have a few opportunities to compete. Maybe AWS do this way to encourage people to push for the limit, and at the end of the day when you come to the physical race, you'll have to adjust your model your stability.
 
 Also, the submission track is not 100% hidden from player, so if you want, you can actually recreate the submission track and overfit your model. Or you can create a formula to follow the best line possible in the track, then the race is not reinforcement learning anymore but more like plotting a racing path. I think I saw some complex formula like that in the internet somewhere, put that formula in the submission track and you'll get a overfit model but run really fast.
 
