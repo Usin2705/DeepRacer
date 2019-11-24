@@ -145,6 +145,9 @@ Solve "ResourceExhaustedError: OOM" problem (hei, if you're at this point at lea
 docker exec -t $(docker ps | grep sagemaker | cut -d" " -f1) redis-cli config set client-output-buffer-limit "slave 836870912 836870912 0"
 ```
 
+### Iteration n is saved to model n
+### Positive steering = turn left, negative steering = turn right (wth?)
+
 SIM_TRACE_LOG explain:
 
 SIM_TRACE_LOG:EPISODE,STEP,X,Y,HEADING(RAD),STEERING(RAD),SPEED,ACTION_INDEX,REWARD,DONE(bool),IS_WHEEL_ON_TRACK(bool),PROGRESS,CLOSEST_WAYPOINTS,TRACK_LENGTH,TIME
