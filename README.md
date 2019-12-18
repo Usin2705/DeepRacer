@@ -81,12 +81,12 @@ As you can see, now the faster model will have higher reward. However, this will
 ## Core formula: reward = ((progress- self.pre_progress)*2)**2 + ((progress- self.pre_progress2))**2
 Human language: the faster the car increase progress during the race, the higher the reward.
 
-Note that there's no other reward in this model, no reward based on current position on the track, no fancy and complex formula to calculate the reward. Car just follow the basic you, the faster you increase your progress, the higher reward you'll get. In other model, you need to calculate and decide what is the best action for the car so its can run faster, in this model, you set the ultimate goal (go faster) and the car will learn by itself how to do it.
+Note that there's no other reward in this model, no reward based on current position on the track, no fancy and complex formula to calculate the reward. Car just follow the basic rule, the faster you increase your progress, the higher reward you'll get. In other model, you need to calculate and decide what is the best action for the car so its can run faster, in this model, you set the ultimate goal (go faster) and the car will learn by itself how to do it.
 
-See the 11.005 second race in the local training (the best I can get so far in local training is around 10.700s):
+Below is the 11.005 second race in the local training (the best I can get so far in local training is around 10.700s):
 <img src=https://github.com/Usin2705/DeepRacer/blob/master/ProgressVelocity-Canada-11-005.png>
 
-Look how close the car near the outside of the track when it turn, notice that it alway target straight line (as I set the highest speed in straight line) whenever possible, and slowdown to make a sharp turn just enough to not go outside of the track and then go straight again. At around 70% of the track, it make a slightly turn on the left and then on the right when it should have go straight for maximum speed and this is where 300 milisecond different come from. Which mean I can shorten my time a little bit more.
+Look how close the car near the outside of the track when it turn, notice that it alway target straight line (as I set the highest speed in straight line) whenever possible, and slowdown to make a sharp turn just enough to not go outside of the track and then go straight again. At around 70% of the track, it make a slightly turn on the left and then on the right when it should have go straight for maximum speed. Maybe this is where 305 milisecond different (11.005 vs 10.700s) come from. Which mean I can shorten my time a little bit more.
 
 Overall, the way the car run around the track look like somebody spend a lot of time to calculate the best path possible for the car, but in reality we just use a simple reward function and the car found out the best path by itself.
 
@@ -120,11 +120,9 @@ If you want you can still use discount factor of 0.999, but from my experience (
 
 
 # AWS DeepRacer
-Thank Amazon for this wonderful experience. I learn a lot about AWS, Linux and Reinforcement Learning from the race, met wonderful people online, participating in a very challenging race until the end (that feeling when people start to kick you down out of the top 20, or every morning when you woke up, opened the console and saw another person reach 7.xxx second *O* )
+Thank Amazon for this wonderful experience. I learn a lot about AWS, Linux and Reinforcement Learning from the race, met wonderful people online, participating in a very challenging race until the end (that feeling when people start to kick you down  and out of the top 20. Or every morning when you woke up, opened the console and saw another person reach 7.xxx second while you struggling with 8.6 \*O\*  )
 
-However, there's a few thing I believe should be improve here. Many people also say this as well. As DeepRacer accept even 1 successful run during 5 trials run in submission, even if you failed 4, as long as you were lucky with 1 run, you got better result than another person with 2 successful run but slower. As the result, to push for faster speed, people will tend to overfit their model, push the speed limit and gambling for 1 successful run in the submission. I did this as well. Therefore, people with more reliable model (and thus slower) are actually punished in the virtual race. Well, it's the same rule for everybody so I can't complain. I just think it would be interesting if AWS require minimum of 2 successful run/5 trials, as people will have to take care of the overfit problem, and the unreliable of their model. Actually, this is more critical in physical race, as you only have a few opportunities to compete. Maybe AWS do this way to encourage people to push for the limit, and at the end of the day when you come to the physical race, you'll have to adjust your model your stability.
-
-Also, the submission track is not 100% hidden from player, so if you want, you can actually recreate the submission track and overfit your model. Or you can create a formula to follow the best line possible in the track, then the race is not reinforcement learning anymore but more like plotting a racing path. I think I saw some complex formula like that in the internet somewhere, put that formula in the submission track and you'll get a overfit model but run really fast.
+The 2020 will would be much more exciting. Now you can change the Reinforcement Learning method instead of using PPO. This will be a good motivation to learning more. There will be 2 more type of race (passing objects and 2 car race toghether). Car now have a LIDAR sensor as well.
 
 ## My own corner, to store my own things:
 ### How to view log file in docker:
