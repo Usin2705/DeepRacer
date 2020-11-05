@@ -2,18 +2,30 @@
 AWS DeepRacer reward functions and stuffs
 
 # 2019 model and more detail explanation
-Click on the 2019 folder for a more detail explanation on why did I choose that type of reward function.
+Click on the [2019](https://github.com/Usin2705/DeepRacer/edit/master/2019/) folder for a more detail explanation on why did I choose that type of reward function.
 In 2020, I did not have enough time to come up with a better model, so I just use the old model from 2019 (with a minor modification)
 
 
 # 2020
+
+Find the [2020 model here](https://github.com/Usin2705/DeepRacer/blob/master/ProgressVelocity.py)
 There're a lot of change in the 2020 race, but I did not change my reward function. The only small thing you need to change here is "A" and "B". The track is longer so you need to increase A and decrease B to get a good reward. Good reward here mean if the car go fast then the reward should be big, and vice versa. I changed the value so much so I did not remember the exact value I used for my model :(
 
 The reason of using this old reward function is simply because I failed to get a better one, due to time limit (the optimization is longer vs last year, I was busy with work and study) and it's hard to find a good reference value (more on this later). 
 
-But please note that the reward fucntion here is still need improvement.
+But please note that the reward fucntion here is still <b>need improvement.</b>
 
-Nevertheless, with just 5 days training, I got a very good result in September virtual race. I even make it to the semifinalist of the head-to-head racing. Although it's fair to mentioned that all the champion from previous races are excluded from the September race =)) . My September model was not optimized (you can see that it went outside of track all the time) and my October model was worse because I was experimenting a new strategy. If you spend your time just to train this model, you could get better result than I did. Anyway, if you look at the picture of a training (it's 2nd highest reward, ideally it should be the highest but the model was not optimized), you can see that from a very simple reward function, the model has learn on how to cut corner and drive straightforward (red circles) (the drive straight have the fastest speed).
+Nevertheless, with just 5 days training, I got a very good result in September virtual race. I even make it to the semifinalist of the head-to-head racing. Although it's fair to mentioned that all the champion from previous races are excluded from the September race =)). 
+
+<img src="https://github.com/Usin2705/DeepRacer/blob/master/Leaderboard-virtual-cumulo-turnpike-2020-79.546.png">
+
+My September model was not optimized (you can see that it went outside of track all the time) and my October model was worse because I was experimenting a new strategy. If you spend your time just to train this model, you could get better result than I did. 
+
+<img src="https://github.com/Usin2705/DeepRacer/blob/master/Leaderboard-virtual-stratus-loop-2020-106.204.png">
+
+Anyway, if you look at the picture of a training (it's 2nd highest reward, ideally it should be the highest but the model was not optimized), you can see that from a very simple reward function, the model has learn on how to cut corner and drive straightforward (red circles) (the drive straight have the fastest speed).
+
+<img src="https://github.com/Usin2705/DeepRacer/blob/master/ProgressVelocity-stratus-loop-40-000.png">
 
 ## Some ideas on how to improve the reward function:
 
